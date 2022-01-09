@@ -1,6 +1,6 @@
 use rand::Rng;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 // Why am i deriving here
 enum Suit{
     Clubs,
@@ -40,8 +40,9 @@ fn main() {
     let mut player_hand_value = 0;
     let mut player_suits = [Suit::NoCard; MAX_CARDS];
     
-    let card = draw_card(number_of_decks, &mut player_cards_in_hand, &mut player_hand_value, &mut player_suits);
-
+    for _i in 0..5 {
+        let card = draw_card(number_of_decks, &mut player_cards_in_hand, &mut player_hand_value, &mut player_suits);
+    }
     //put this stuff in the function
     //
     //Should i? ya i should but use another function to show what im doing
@@ -50,21 +51,25 @@ fn main() {
 
 
     println!("Hello here are your arrays: player_cards_hand: {}", player_cards_in_hand);
+    println!("Hello here are your arrays: player_suits: {:?}", player_suits);
     println!("Hello here are your arrays: player_hand_value: {}", player_hand_value);
-    println!("Hello here are your arrays: player_suits: {}", player_suits);
+
 }
 
 fn draw_card(number_of_decks: u32, player_cards_in_hand: &mut u32, player_hand_value: &mut u32, player_suits: &mut [Suit]) -> (Suit, u32){
 
     let min_range = 0;
     let max_range = 52 * number_of_decks;
-    let card = rand::thread_rng().gen_range(min_range, max_range);
+    println!("min_range: {}", min_range);
+    println!("max_range: {}", max_range);
+    let card = rand::thread_rng().gen_range(min_range, max_range); //Will this ever go to 52?? if it does, it'll cause an error in card_value
    
+    println!("card: {}", card);
 
     let card: (Suit, u32)  = card_value(card);
     
-    *player_cards_in_hand += card.1;
     player_suits[*player_cards_in_hand as usize] = card.0;
+    *player_cards_in_hand += 1;
     *player_hand_value += card.1;
 
 
@@ -74,8 +79,8 @@ fn draw_card(number_of_decks: u32, player_cards_in_hand: &mut u32, player_hand_v
 
 fn card_value(card_in: u32) -> (Suit, u32){
     let card_in = card_in % 52; //Cut off the "deck number"
-    let suit = card_in % 13;
-    let value = card_in/13;
+    let suit = card_in / 13;
+    let value = card_in%13;
     
     let suit: Suit = match suit {
         0 => Suit::Clubs, 
@@ -85,9 +90,9 @@ fn card_value(card_in: u32) -> (Suit, u32){
         _ => Suit::NoCard,
     };
 
-    if let Suit::NoCard = suit
+    if suit == Suit::NoCard
     {
-        println!("Error: Card number is larger than 52 or lower than 0");
+        println!("Error: Card number is larger than 51 or lower than 0");
     }
 
     return (suit, value);
